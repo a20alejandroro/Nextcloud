@@ -1,0 +1,83 @@
+services:
+
+  server1:
+    build: ./nextcloud
+    container_name: server1
+    hostname: server1
+    volumes:
+      - ./nextcloud/nextcloud_apache.conf:/etc/apache2/sites-enabled/nextcloud_apache.conf
+      - ./certificados:/etc/ssl/certs
+      - nextcloud_data:/var/www/html
+      - ./nextcloud/config.php:/var/www/html/config/config.php
+      - ./nextcloud/php.ini:/usr/local/etc/php/conf.d/redis-session.ini
+    env_file:
+      - ./nextcloud/.env.nextcloud
+    networks:
+      redebackend:
+
+  server2:
+    build: ./nextcloud
+    container_name: server2
+    hostname: server2
+    volumes:
+      - ./nextcloud/nextcloud_apache.conf:/etc/apache2/sites-enabled/nextcloud_apache.conf
+      - ./certificados:/etc/ssl/certs
+      - nextcloud_data:/var/www/html
+      - ./nextcloud/config.php:/var/www/html/config/config.php
+      - ./nextcloud/php.ini:/usr/local/etc/php/conf.d/redis-session.ini
+    env_file:
+      - ./nextcloud/.env.nextcloud
+    networks:
+      redebackend:
+
+  server3:
+    build: ./nextcloud
+    container_name: server3
+    hostname: server3
+    volumes:
+      - ./nextcloud/nextcloud_apache.conf:/etc/apache2/sites-enabled/nextcloud_apache.conf
+      - ./certificados:/etc/ssl/certs
+      - nextcloud_data:/var/www/html
+      - ./nextcloud/config.php:/var/www/html/config/config.php
+      - ./nextcloud/php.ini:/usr/local/etc/php/conf.d/redis-session.ini
+    env_file:
+      - ./nextcloud/.env.nextcloud
+    networks:
+      redebackend:
+
+  haproxy:
+    image: haproxy:latest
+    container_name: haproxy
+    hostname: haproxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+      - ./certificados/haproxy.pem:/usr/local/etc/haproxy/certs/haproxy.pem
+    networks:
+      redefrontend:
+        ipv4_address: 172.19.0.10
+      redebackend:
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      redebackend:
+
+volumes:
+  nextcloud_data:
+  
+networks:
+  redefrontend:
+    ipam:
+      config:
+        - subnet: 172.19.0.0/16
+  redebackend:
+    
+
+
+
